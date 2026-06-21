@@ -99,6 +99,46 @@ return [
             'sslmode' => env('DB_SSLMODE', 'prefer'),
         ],
 
+        // Conexão 'tenant' — aponta pro MESMO database, mas com search_path
+        // dinâmico pro schema do tenant ativo. O IdentifyTenant middleware
+        // recarrega essa config em cada request antes do controller rodar.
+        //
+        // Estrutura final:
+        //   DB 'pgsql' (default) → schema public  → tenants, users_global,
+        //                                            personal_access_tokens,
+        //                                            password_reset_tokens
+        //   DB 'tenant'          → schema tenant_X → companies, users, staff,
+        //                                            clients, services, products,
+        //                                            appointments, chats, ...
+        //
+        // Os models de negócio usam protected $connection = 'tenant'.
+        // O Sanctum/Auth usa a conexão default (public), porque o login é cross-tenant.
+        //
+        // A chave `schema` é lida pela migration 000010 (bootstrap do schema).
+        // O middleware/Job/Command setam essa chave via
+        //   config(['database.connections.tenant.schema' => 'tenant_X']);
+        //   DB::purge('tenant');
+        // e o `search_path` é recalculado a partir dela.
+        'tenant' => [
+            'driver' => 'pgsql',
+            'url' => env('DB_URL'),
+            'host' => env('DB_HOST', '127.0.0.1'),
+            'port' => env('DB_PORT', '5432'),
+            'database' => env('DB_DATABASE', 'laravel'),
+            'username' => env('DB_USERNAME', 'root'),
+            'password' => env('DB_PASSWORD', ''),
+            'charset' => env('DB_CHARSET', 'utf8'),
+            'prefix' => '',
+            'prefix_indexes' => true,
+            // `schema` é o schema ativo desta conexão. Setado em runtime pelo
+            // IdentifyTenant middleware / ProvisionTenantSchema job / TenantsMigrate
+            // command. Mantemos `search_path` como fallback derivado, pra rodar
+            // migrations e queries usando o schema certo.
+            'schema' => env('DB_TENANT_SCHEMA'),
+            'search_path' => env('DB_TENANT_SCHEMA', 'public'),
+            'sslmode' => env('DB_SSLMODE', 'prefer'),
+        ],
+
         'sqlsrv' => [
             'driver' => 'sqlsrv',
             'url' => env('DB_URL'),

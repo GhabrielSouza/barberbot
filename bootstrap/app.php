@@ -17,7 +17,8 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->alias([
-            'verified' => \App\Http\Middleware\EnsureEmailIsVerified::class,
+            'verified'        => \App\Http\Middleware\EnsureEmailIsVerified::class,
+            'identify.tenant' => \App\Http\Middleware\IdentifyTenant::class,
         ]);
 
         //
