@@ -40,12 +40,6 @@ class Tenant extends Model
         'city',
         'phone',
         'status',
-        'plan',
-        'trial_ends_at',
-    ];
-
-    protected $casts = [
-        'trial_ends_at' => 'datetime',
     ];
 
     /**
