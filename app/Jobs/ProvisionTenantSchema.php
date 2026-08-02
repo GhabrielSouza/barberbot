@@ -55,6 +55,16 @@ class ProvisionTenantSchema implements ShouldQueue
 
     public function handle(): void
     {
+        // SQLite não suporta schemas PostgreSQL; pular provisionamento em testes
+        // unitários/feature que rodam com DB_CONNECTION=sqlite.
+        if (DB::connection()->getDriverName() === 'sqlite') {
+            Log::info('Provisionamento de schema ignorado em SQLite', [
+                'tenant_id' => $this->tenantId,
+            ]);
+
+            return;
+        }
+
         $tenant = DB::table('tenants')->where('id', $this->tenantId)->first();
 
         if (! $tenant) {
