@@ -4,6 +4,7 @@ use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\BarberController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ScheduleController;
+use App\Http\Controllers\PlanController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\WhatsAppController;
 use Illuminate\Support\Facades\Route;
@@ -12,6 +13,17 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('webhook')->group(function () {
     Route::post('whatsapp', [WhatsAppController::class, 'webhook']);
     Route::get('test', [WhatsAppController::class, 'test']);
+});
+
+// Plans Routes (catálogo global de planos, schema public)
+Route::middleware(['api'])->prefix('plans')->group(function () {
+    Route::get('/', [PlanController::class, 'index']);
+    Route::post('/', [PlanController::class, 'store']);
+    Route::get('active', [PlanController::class, 'active']);
+    Route::get('{plan}', [PlanController::class, 'show']);
+    Route::put('{plan}', [PlanController::class, 'update']);
+    Route::patch('{plan}/toggle', [PlanController::class, 'toggleActive']);
+    Route::delete('{plan}', [PlanController::class, 'destroy']);
 });
 
 // Routes that require company_id parameter
