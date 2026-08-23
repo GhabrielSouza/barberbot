@@ -5,6 +5,7 @@ use App\Http\Controllers\BarberController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\TenantController;
 use App\Http\Controllers\WhatsAppController;
 use Illuminate\Support\Facades\Route;
 
@@ -12,6 +13,16 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('webhook')->group(function () {
     Route::post('whatsapp', [WhatsAppController::class, 'webhook']);
     Route::get('test', [WhatsAppController::class, 'test']);
+});
+
+// Tenants Routes (catálogo global, schema public)
+Route::middleware(['api'])->prefix('tenants')->group(function () {
+    Route::get('/', [TenantController::class, 'index']);
+    Route::post('/', [TenantController::class, 'store']);
+    Route::get('{tenant}', [TenantController::class, 'show']);
+    Route::put('{tenant}', [TenantController::class, 'update']);
+    Route::patch('{tenant}/cancel', [TenantController::class, 'cancel']);
+    Route::delete('{tenant}', [TenantController::class, 'destroy']);
 });
 
 // Routes that require company_id parameter
