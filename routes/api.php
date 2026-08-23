@@ -4,6 +4,7 @@ use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\BarberController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ScheduleController;
+use App\Http\Controllers\CommissionMethodController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\WhatsAppController;
 use Illuminate\Support\Facades\Route;
@@ -12,6 +13,15 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('webhook')->group(function () {
     Route::post('whatsapp', [WhatsAppController::class, 'webhook']);
     Route::get('test', [WhatsAppController::class, 'test']);
+});
+
+// Commission Methods Routes (catálogo global, schema public)
+Route::middleware(['api'])->prefix('commission-methods')->group(function () {
+    Route::get('/', [CommissionMethodController::class, 'index']);
+    Route::post('/', [CommissionMethodController::class, 'store']);
+    Route::get('{commission_method}', [CommissionMethodController::class, 'show']);
+    Route::put('{commission_method}', [CommissionMethodController::class, 'update']);
+    Route::delete('{commission_method}', [CommissionMethodController::class, 'destroy']);
 });
 
 // Routes that require company_id parameter
