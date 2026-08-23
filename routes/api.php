@@ -5,6 +5,7 @@ use App\Http\Controllers\BarberController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\WhatsAppController;
 use Illuminate\Support\Facades\Route;
 
@@ -12,6 +13,18 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('webhook')->group(function () {
     Route::post('whatsapp', [WhatsAppController::class, 'webhook']);
     Route::get('test', [WhatsAppController::class, 'test']);
+});
+
+// Tenants Routes (catálogo global, schema public)
+Route::middleware(['api'])->prefix('tenants/{tenant}')->group(function () {
+    // Users Routes (logins globais do tenant)
+    Route::prefix('users')->group(function () {
+        Route::get('/', [UserController::class, 'index']);
+        Route::post('/', [UserController::class, 'store']);
+        Route::get('{user}', [UserController::class, 'show']);
+        Route::put('{user}', [UserController::class, 'update']);
+        Route::delete('{user}', [UserController::class, 'destroy']);
+    });
 });
 
 // Routes that require company_id parameter
