@@ -69,14 +69,14 @@ class User extends Authenticatable
      */
     public function conversation()
     {
-        return $this->hasOne(Conversation::class);
+        return $this->belongsTo(Tenant::class);
     }
 
     /**
      * Get all messages for this user.
      */
-    public function messages(): HasMany
+    public function getAuthPassword(): string
     {
-        return $this->hasMany(Message::class);
+        return $this->password_hash;
     }
 }
