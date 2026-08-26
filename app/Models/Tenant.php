@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Observers\TenantObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -28,6 +29,7 @@ use Illuminate\Database\Eloquent\Model;
 #[ObservedBy([TenantObserver::class])]
 class Tenant extends Model
 {
+    use HasFactory;
     use HasUuids;
 
     protected $table = 'tenants';
