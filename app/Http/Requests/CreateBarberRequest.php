@@ -21,7 +21,11 @@ class CreateBarberRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'active' => ['optional', 'boolean'],
+            'role' => ['sometimes', 'nullable', 'string', 'max:100'],
+            'color' => ['sometimes', 'nullable', 'string', 'max:50'],
+            'is_admin' => ['sometimes', 'boolean'],
+            'user_id' => ['sometimes', 'uuid'],
+            'active' => ['sometimes', 'boolean'],
         ];
     }
 
@@ -34,6 +38,12 @@ class CreateBarberRequest extends FormRequest
             'name.required' => 'Barber name is required',
             'name.string' => 'Barber name must be a string',
             'name.max' => 'Barber name cannot exceed 255 characters',
+            'role.string' => 'Role must be a string',
+            'role.max' => 'Role cannot exceed 100 characters',
+            'color.string' => 'Color must be a string',
+            'color.max' => 'Color cannot exceed 50 characters',
+            'is_admin.boolean' => 'is_admin must be a boolean',
+            'user_id.uuid' => 'User ID must be a valid UUID',
             'active.boolean' => 'Active field must be a boolean',
         ];
     }

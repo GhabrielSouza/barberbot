@@ -3,20 +3,19 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
-/**
- * User — login global (schema public), usado para autenticar antes de
- * resolver o tenant. Não confundir com dados de negócio (Client, TeamMember,
- * ...) que vivem no schema do tenant (conexão "tenant").
- *
- * role: owner | supervisor | atendente
- */
 class User extends Authenticatable
 {
-    use HasUuids, Notifiable;
+    use HasApiTokens;
+    use HasFactory;
+    use HasUuids;
+    use Notifiable;
 
     protected $table = 'users';
 
@@ -30,16 +29,51 @@ class User extends Authenticatable
 
     protected $hidden = [
         'password_hash',
+        'remember_token',
     ];
 
+    protected function casts(): array
+    {
+        return [
+            'password_hash' => 'hashed',
+            'email_verified_at' => 'datetime',
+        ];
+    }
+
+    /**
+     * Tell Laravel which column holds the hashed password.
+     */
+    public function getAuthPassword(): string
+    {
+        return $this->password_hash;
+    }
+
+    /**
+     * The tenant this user belongs to (schema public).
+     */
     public function tenant(): BelongsTo
     {
         return $this->belongsTo(Tenant::class);
     }
 
     /**
-     * Laravel's auth guard expects getAuthPassword(); a coluna aqui é
-     * `password_hash`, não `password`.
+     * Get all appointments for this user.
+     */
+    public function appointments(): HasMany
+    {
+        return $this->hasMany(Appointment::class);
+    }
+
+    /**
+     * Get conversation for this user.
+     */
+    public function conversation()
+    {
+        return $this->belongsTo(Tenant::class);
+    }
+
+    /**
+     * Get all messages for this user.
      */
     public function getAuthPassword(): string
     {
