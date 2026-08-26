@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\BarberController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\WhatsAppController;
@@ -107,6 +108,17 @@ Route::middleware(['api', 'auth'])->group(function () {
             Route::put('{service}', [ServiceController::class, 'update']);
             Route::patch('{service}/toggle', [ServiceController::class, 'toggleActive']);
             Route::delete('{service}', [ServiceController::class, 'destroy']);
+        });
+
+        // Products Routes
+        Route::prefix('products')->group(function () {
+            Route::get('/', [ProductController::class, 'index']);
+            Route::post('/', [ProductController::class, 'store']);
+            Route::get('active', [ProductController::class, 'active']);
+            Route::get('{product}', [ProductController::class, 'show']);
+            Route::put('{product}', [ProductController::class, 'update']);
+            Route::patch('{product}/toggle', [ProductController::class, 'toggleActive']);
+            Route::delete('{product}', [ProductController::class, 'destroy']);
         });
     });
 });
