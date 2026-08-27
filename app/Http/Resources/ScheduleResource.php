@@ -31,8 +31,8 @@ class ScheduleResource extends JsonResource
             'day_name' => $daysOfWeek[$this->day_of_week],
             'start_time' => $this->start_time,
             'end_time' => $this->end_time,
-            'created_at' => $this->created_at->toIso8601String(),
-            'updated_at' => $this->updated_at->toIso8601String(),
+            'created_at' => optional($this->created_at)?->toIso8601String(),
+            'updated_at' => optional($this->updated_at)?->toIso8601String(),
         ];
     }
 }

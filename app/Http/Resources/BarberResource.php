@@ -17,12 +17,15 @@ class BarberResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'company_id' => $this->company_id,
+            'role' => $this->role,
+            'color' => $this->color,
+            'is_admin' => $this->is_admin,
+            'user_id' => $this->user_id,
             'active' => $this->active,
             'schedules' => ScheduleResource::collection($this->whenLoaded('schedules')),
             'appointments_count' => $this->whenCounted('appointments'),
-            'created_at' => $this->created_at->toIso8601String(),
-            'updated_at' => $this->updated_at->toIso8601String(),
+            'created_at' => optional($this->created_at)?->toIso8601String(),
+            'updated_at' => optional($this->updated_at)?->toIso8601String(),
         ];
     }
 }

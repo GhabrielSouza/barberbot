@@ -8,11 +8,19 @@ use App\Http\Resources\ScheduleResource;
 use App\Models\Barber;
 use App\Models\Company;
 use App\Models\Schedule;
+use App\Services\ScheduleService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class ScheduleController extends Controller
 {
+    protected ScheduleService $scheduleService;
+
+    public function __construct(ScheduleService $scheduleService)
+    {
+        $this->scheduleService = $scheduleService;
+    }
+
     /**
      * Get schedules for a barber
      *
@@ -22,16 +30,7 @@ class ScheduleController extends Controller
      */
     public function indexForBarber(Company $company, Barber $barber): AnonymousResourceCollection
     {
-        if ($barber->company_id !== $company->id) {
-            abort(403);
-        }
-
-        $schedules = Schedule::where('barber_id', $barber->id)
-            ->orderBy('day_of_week')
-            ->orderBy('start_time')
-            ->get();
-
-        return ScheduleResource::collection($schedules);
+        return ScheduleResource::collection($this->scheduleService->listByBarber($barber));
     }
 
     /**
@@ -44,16 +43,7 @@ class ScheduleController extends Controller
      */
     public function store(CreateScheduleRequest $request, Company $company, Barber $barber): ScheduleResource
     {
-        if ($barber->company_id !== $company->id) {
-            abort(403);
-        }
-
-        $schedule = Schedule::create([
-            'barber_id' => $barber->id,
-            'day_of_week' => $request->day_of_week,
-            'start_time' => $request->start_time,
-            'end_time' => $request->end_time,
-        ]);
+        $schedule = $this->scheduleService->createSchedule($barber, $request->validated());
 
         return new ScheduleResource($schedule);
     }
@@ -68,10 +58,6 @@ class ScheduleController extends Controller
      */
     public function show(Company $company, Barber $barber, Schedule $schedule): ScheduleResource
     {
-        if ($barber->company_id !== $company->id || $schedule->barber_id !== $barber->id) {
-            abort(403);
-        }
-
         return new ScheduleResource($schedule);
     }
 
@@ -90,11 +76,7 @@ class ScheduleController extends Controller
         Barber $barber,
         Schedule $schedule
     ): ScheduleResource {
-        if ($barber->company_id !== $company->id || $schedule->barber_id !== $barber->id) {
-            abort(403);
-        }
-
-        $schedule->update($request->only(['day_of_week', 'start_time', 'end_time']));
+        $schedule = $this->scheduleService->updateSchedule($schedule, $request->validated());
 
         return new ScheduleResource($schedule);
     }
@@ -109,11 +91,7 @@ class ScheduleController extends Controller
      */
     public function destroy(Company $company, Barber $barber, Schedule $schedule): JsonResponse
     {
-        if ($barber->company_id !== $company->id || $schedule->barber_id !== $barber->id) {
-            abort(403);
-        }
-
-        $schedule->delete();
+        $this->scheduleService->deleteSchedule($schedule);
 
         return response()->json([
             'success' => true,
@@ -131,16 +109,7 @@ class ScheduleController extends Controller
      */
     public function byDay(Company $company, Barber $barber, int $day): AnonymousResourceCollection
     {
-        if ($barber->company_id !== $company->id) {
-            abort(403);
-        }
-
-        $schedules = Schedule::where('barber_id', $barber->id)
-            ->where('day_of_week', $day)
-            ->orderBy('start_time')
-            ->get();
-
-        return ScheduleResource::collection($schedules);
+        return ScheduleResource::collection($this->scheduleService->listByDay($barber, $day));
     }
 
     /**
@@ -152,32 +121,17 @@ class ScheduleController extends Controller
      */
     public function bulkCreate(Company $company, Barber $barber): JsonResponse
     {
-        if ($barber->company_id !== $company->id) {
-            abort(403);
-        }
-
         $request = request();
-        $schedules = $request->input('schedules', []);
+        $schedulesData = $request->input('schedules', []);
 
-        if (empty($schedules)) {
+        if (empty($schedulesData)) {
             return response()->json([
                 'success' => false,
                 'message' => 'No schedules provided',
             ], 422);
         }
 
-        // Delete existing schedules
-        Schedule::where('barber_id', $barber->id)->delete();
-
-        // Create new schedules
-        foreach ($schedules as $schedule) {
-            Schedule::create([
-                'barber_id' => $barber->id,
-                'day_of_week' => $schedule['day_of_week'],
-                'start_time' => $schedule['start_time'],
-                'end_time' => $schedule['end_time'],
-            ]);
-        }
+        $this->scheduleService->bulkCreateSchedules($barber, $schedulesData);
 
         return response()->json([
             'success' => true,
@@ -185,3 +139,4 @@ class ScheduleController extends Controller
         ]);
     }
 }
+

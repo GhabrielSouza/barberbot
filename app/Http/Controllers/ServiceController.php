@@ -13,14 +13,14 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 class ServiceController extends Controller
 {
     /**
-     * List all services for a company
+     * List all services for a company.
      *
-     * @param Company $company
-     * @return AnonymousResourceCollection
+     * The current tenant schema does not include company_id in services,
+     * so the list is not filtered by foreign key.
      */
     public function index(Company $company): AnonymousResourceCollection
     {
-        $services = Service::where('company_id', $company->id)
+        $services = Service::query()
             ->orderBy('name')
             ->paginate(15);
 
@@ -28,14 +28,11 @@ class ServiceController extends Controller
     }
 
     /**
-     * Get active services only
-     *
-     * @param Company $company
-     * @return AnonymousResourceCollection
+     * Get active services only.
      */
     public function active(Company $company): AnonymousResourceCollection
     {
-        $services = Service::where('company_id', $company->id)
+        $services = Service::query()
             ->where('active', true)
             ->orderBy('name')
             ->get();
@@ -44,19 +41,17 @@ class ServiceController extends Controller
     }
 
     /**
-     * Create a new service
-     *
-     * @param CreateServiceRequest $request
-     * @param Company $company
-     * @return ServiceResource
+     * Create a new service.
      */
     public function store(CreateServiceRequest $request, Company $company): ServiceResource
     {
+        $duration = $request->input('duration_minutes', $request->input('duration_min', 0));
+
         $service = Service::create([
             'name' => $request->name,
             'price' => $request->price,
-            'duration_minutes' => $request->duration_minutes,
-            'company_id' => $company->id,
+            'duration_min' => (int) $duration,
+            'category' => $request->category,
             'active' => $request->active ?? true,
         ]);
 
@@ -64,53 +59,35 @@ class ServiceController extends Controller
     }
 
     /**
-     * Get service details
-     *
-     * @param Company $company
-     * @param Service $service
-     * @return ServiceResource
+     * Get service details.
      */
     public function show(Company $company, Service $service): ServiceResource
     {
-        if ($service->company_id !== $company->id) {
-            abort(403);
-        }
-
         return new ServiceResource($service);
     }
 
     /**
-     * Update service
-     *
-     * @param UpdateServiceRequest $request
-     * @param Company $company
-     * @param Service $service
-     * @return ServiceResource
+     * Update service.
      */
     public function update(UpdateServiceRequest $request, Company $company, Service $service): ServiceResource
     {
-        if ($service->company_id !== $company->id) {
-            abort(403);
+        $data = $request->all();
+
+        if (array_key_exists('duration_minutes', $data) || array_key_exists('duration_min', $data)) {
+            $data['duration_min'] = (int) ($data['duration_minutes'] ?? $data['duration_min']);
+            unset($data['duration_minutes']);
         }
 
-        $service->update($request->only(['name', 'price', 'duration_minutes', 'active']));
+        $service->update($data);
 
-        return new ServiceResource($service);
+        return new ServiceResource($service->fresh());
     }
 
     /**
-     * Toggle service active status
-     *
-     * @param Company $company
-     * @param Service $service
-     * @return JsonResponse
+     * Toggle service active status.
      */
     public function toggleActive(Company $company, Service $service): JsonResponse
     {
-        if ($service->company_id !== $company->id) {
-            abort(403);
-        }
-
         $service->update(['active' => !$service->active]);
 
         return response()->json([
@@ -121,18 +98,10 @@ class ServiceController extends Controller
     }
 
     /**
-     * Delete service
-     *
-     * @param Company $company
-     * @param Service $service
-     * @return JsonResponse
+     * Delete service.
      */
     public function destroy(Company $company, Service $service): JsonResponse
     {
-        if ($service->company_id !== $company->id) {
-            abort(403);
-        }
-
         $service->delete();
 
         return response()->json([

@@ -14,15 +14,18 @@ class ServiceResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $durationMinutes = (int) ($this->duration_min ?? $this->duration_minutes ?? 0);
+
         return [
             'id' => $this->id,
             'name' => $this->name,
             'price' => (float) $this->price,
-            'duration_minutes' => $this->duration_minutes,
-            'company_id' => $this->company_id,
-            'active' => $this->active,
-            'created_at' => $this->created_at->toIso8601String(),
-            'updated_at' => $this->updated_at->toIso8601String(),
+            'duration_minutes' => $durationMinutes,
+            'duration_min' => $durationMinutes,
+            'category' => $this->category,
+            'active' => (bool) $this->active,
+            'created_at' => $this->created_at?->toIso8601String(),
+            'updated_at' => $this->updated_at?->toIso8601String(),
         ];
     }
 }

@@ -17,8 +17,10 @@ return new class extends Migration {
             $table->foreignUuid('tenant_id')->constrained('tenants')->cascadeOnDelete();
             $table->string('name');
             $table->string('email')->unique();
+            $table->timestamp('email_verified_at')->nullable();
             $table->string('password_hash');
             $table->string('role', 20)->default('owner'); // owner|supervisor|atendente
+            $table->rememberToken();
             $table->timestamps();
 
             $table->index('tenant_id');

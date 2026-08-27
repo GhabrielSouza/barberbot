@@ -10,6 +10,8 @@ class Schedule extends Model
 {
     use HasFactory;
 
+    protected $connection = 'tenant';
+
     protected $fillable = [
         'barber_id',
         'day_of_week',
