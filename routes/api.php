@@ -7,6 +7,7 @@ use App\Http\Controllers\BarberController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ScheduleController;
+use App\Http\Controllers\PlanController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WhatsAppController;
@@ -52,6 +53,17 @@ Route::middleware(['api', \Illuminate\Session\Middleware\StartSession::class])->
     })
         ->middleware('auth')
         ->name('api.user');
+});
+
+// Plans Routes (catálogo global de planos, schema public)
+Route::middleware(['api'])->prefix('plans')->group(function () {
+    Route::get('/', [PlanController::class, 'index']);
+    Route::post('/', [PlanController::class, 'store']);
+    Route::get('active', [PlanController::class, 'active']);
+    Route::get('{plan}', [PlanController::class, 'show']);
+    Route::put('{plan}', [PlanController::class, 'update']);
+    Route::patch('{plan}/toggle', [PlanController::class, 'toggleActive']);
+    Route::delete('{plan}', [PlanController::class, 'destroy']);
 });
 
 // Tenants Routes (catálogo global, schema public)
