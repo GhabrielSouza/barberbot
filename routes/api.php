@@ -7,6 +7,7 @@ use App\Http\Controllers\BarberController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ScheduleController;
+use App\Http\Controllers\CommissionMethodController;
 use App\Http\Controllers\PlanController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\UserController;
@@ -53,6 +54,15 @@ Route::middleware(['api', \Illuminate\Session\Middleware\StartSession::class])->
     })
         ->middleware('auth')
         ->name('api.user');
+});
+
+// Commission Methods Routes (catálogo global, schema public)
+Route::middleware(['api'])->prefix('commission-methods')->group(function () {
+    Route::get('/', [CommissionMethodController::class, 'index']);
+    Route::post('/', [CommissionMethodController::class, 'store']);
+    Route::get('{commission_method}', [CommissionMethodController::class, 'show']);
+    Route::put('{commission_method}', [CommissionMethodController::class, 'update']);
+    Route::delete('{commission_method}', [CommissionMethodController::class, 'destroy']);
 });
 
 // Plans Routes (catálogo global de planos, schema public)
