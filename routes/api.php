@@ -10,6 +10,7 @@ use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\CommissionMethodController;
 use App\Http\Controllers\PlanController;
 use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\TenantController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WhatsAppController;
 use Illuminate\Http\Request;
@@ -65,6 +66,16 @@ Route::middleware(['api'])->prefix('commission-methods')->group(function () {
     Route::delete('{commission_method}', [CommissionMethodController::class, 'destroy']);
 });
 
+// Tenants Routes (catálogo global, schema public)
+Route::middleware(['api'])->prefix('tenants')->group(function () {
+    Route::get('/', [TenantController::class, 'index']);
+    Route::post('/', [TenantController::class, 'store']);
+    Route::get('{tenant}', [TenantController::class, 'show']);
+    Route::put('{tenant}', [TenantController::class, 'update']);
+    Route::patch('{tenant}/cancel', [TenantController::class, 'cancel']);
+    Route::delete('{tenant}', [TenantController::class, 'destroy']);
+});
+
 // Plans Routes (catálogo global de planos, schema public)
 Route::middleware(['api'])->prefix('plans')->group(function () {
     Route::get('/', [PlanController::class, 'index']);
@@ -76,9 +87,8 @@ Route::middleware(['api'])->prefix('plans')->group(function () {
     Route::delete('{plan}', [PlanController::class, 'destroy']);
 });
 
-// Tenants Routes (catálogo global, schema public)
+// Tenant Users Routes (logins globais do tenant)
 Route::middleware(['api'])->prefix('tenants/{tenant}')->group(function () {
-    // Users Routes (logins globais do tenant)
     Route::prefix('users')->group(function () {
         Route::get('/', [UserController::class, 'index']);
         Route::post('/', [UserController::class, 'store']);
