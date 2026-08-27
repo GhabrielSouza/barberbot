@@ -2,31 +2,62 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
-class User extends Model
+class User extends Authenticatable
 {
+    use HasApiTokens;
     use HasFactory;
+    use HasUuids;
+    use Notifiable;
+
+    protected $table = 'users';
 
     protected $fillable = [
+        'tenant_id',
         'name',
-        'phone',
-        'company_id',
+        'email',
+        'password_hash',
+        'role',
     ];
 
-    /**
-     * Get the company that owns this user
-     */
-    public function company(): BelongsTo
+    protected $hidden = [
+        'password_hash',
+        'remember_token',
+    ];
+
+    protected function casts(): array
     {
-        return $this->belongsTo(Company::class);
+        return [
+            'password_hash' => 'hashed',
+            'email_verified_at' => 'datetime',
+        ];
     }
 
     /**
-     * Get all appointments for this user
+     * Tell Laravel which column holds the hashed password.
+     */
+    public function getAuthPassword(): string
+    {
+        return $this->password_hash;
+    }
+
+    /**
+     * The tenant this user belongs to (schema public).
+     */
+    public function tenant(): BelongsTo
+    {
+        return $this->belongsTo(Tenant::class);
+    }
+
+    /**
+     * Get all appointments for this user.
      */
     public function appointments(): HasMany
     {
@@ -34,18 +65,18 @@ class User extends Model
     }
 
     /**
-     * Get conversation for this user
+     * Get conversation for this user.
      */
     public function conversation()
     {
-        return $this->hasOne(Conversation::class);
+        return $this->belongsTo(Tenant::class);
     }
 
     /**
-     * Get all messages for this user
+     * Get all messages for this user.
      */
-    public function messages(): HasMany
+    public function getAuthPassword(): string
     {
-        return $this->hasMany(Message::class);
+        return $this->password_hash;
     }
 }

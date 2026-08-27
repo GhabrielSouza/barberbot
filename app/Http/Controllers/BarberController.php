@@ -7,11 +7,19 @@ use App\Http\Requests\UpdateBarberRequest;
 use App\Http\Resources\BarberResource;
 use App\Models\Barber;
 use App\Models\Company;
+use App\Services\BarberService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class BarberController extends Controller
 {
+    protected BarberService $barberService;
+
+    public function __construct(BarberService $barberService)
+    {
+        $this->barberService = $barberService;
+    }
+
     /**
      * List all barbers for a company
      *
@@ -20,12 +28,7 @@ class BarberController extends Controller
      */
     public function index(Company $company): AnonymousResourceCollection
     {
-        $barbers = Barber::where('company_id', $company->id)
-            ->with('schedules')
-            ->orderBy('name')
-            ->paginate(15);
-
-        return BarberResource::collection($barbers);
+        return BarberResource::collection($this->barberService->listBarbers($company));
     }
 
     /**
@@ -36,13 +39,7 @@ class BarberController extends Controller
      */
     public function active(Company $company): AnonymousResourceCollection
     {
-        $barbers = Barber::where('company_id', $company->id)
-            ->where('active', true)
-            ->with('schedules')
-            ->orderBy('name')
-            ->get();
-
-        return BarberResource::collection($barbers);
+        return BarberResource::collection($this->barberService->listActiveBarbers($company));
     }
 
     /**
@@ -54,11 +51,7 @@ class BarberController extends Controller
      */
     public function store(CreateBarberRequest $request, Company $company): BarberResource
     {
-        $barber = Barber::create([
-            'name' => $request->name,
-            'company_id' => $company->id,
-            'active' => $request->active ?? true,
-        ]);
+        $barber = $this->barberService->createBarber($company, $request->validated());
 
         return new BarberResource($barber);
     }
@@ -72,11 +65,8 @@ class BarberController extends Controller
      */
     public function show(Company $company, Barber $barber): BarberResource
     {
-        if ($barber->company_id !== $company->id) {
-            abort(403);
-        }
-
         $barber->load(['schedules', 'appointments']);
+
         return new BarberResource($barber);
     }
 
@@ -90,11 +80,7 @@ class BarberController extends Controller
      */
     public function update(UpdateBarberRequest $request, Company $company, Barber $barber): BarberResource
     {
-        if ($barber->company_id !== $company->id) {
-            abort(403);
-        }
-
-        $barber->update($request->only(['name', 'active']));
+        $barber = $this->barberService->updateBarber($company, $barber, $request->validated());
 
         $barber->load('schedules');
         return new BarberResource($barber);
@@ -109,11 +95,7 @@ class BarberController extends Controller
      */
     public function toggleActive(Company $company, Barber $barber): JsonResponse
     {
-        if ($barber->company_id !== $company->id) {
-            abort(403);
-        }
-
-        $barber->update(['active' => !$barber->active]);
+        $barber = $this->barberService->toggleActive($company, $barber);
 
         return response()->json([
             'success' => true,
@@ -131,11 +113,7 @@ class BarberController extends Controller
      */
     public function destroy(Company $company, Barber $barber): JsonResponse
     {
-        if ($barber->company_id !== $company->id) {
-            abort(403);
-        }
-
-        $barber->delete();
+        $this->barberService->deleteBarber($company, $barber);
 
         return response()->json([
             'success' => true,
