@@ -21,6 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'verified'             => \App\Http\Middleware\EnsureEmailIsVerified::class,
             'identify.tenant'      => \App\Http\Middleware\IdentifyTenant::class,
             'resolve.tenant.user'  => \App\Http\Middleware\ResolveTenantFromUser::class,
+            'guest.api'            => \App\Http\Middleware\EnsureApiGuest::class,
         ]);
 
         //

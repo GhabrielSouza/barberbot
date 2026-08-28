@@ -35,18 +35,18 @@ class RegisterRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'name.required' => 'Name is required',
-            'name.string' => 'Name must be a string',
-            'name.max' => 'Name cannot exceed 255 characters',
-            'email.required' => 'Email is required',
-            'email.email' => 'Email must be a valid email address',
-            'email.max' => 'Email cannot exceed 255 characters',
-            'email.unique' => 'This email is already in use',
-            'password.required' => 'Password is required',
-            'password.confirmed' => 'Password confirmation does not match',
-            'tenant_name.required' => 'Company name is required',
-            'tenant_name.string' => 'Company name must be a string',
-            'tenant_name.max' => 'Company name cannot exceed 255 characters',
+            'name.required' => 'O nome é obrigatório',
+            'name.string' => 'O nome deve ser um texto',
+            'name.max' => 'O nome não pode exceder 255 caracteres',
+            'email.required' => 'O e-mail é obrigatório',
+            'email.email' => 'O e-mail deve ser um endereço válido',
+            'email.max' => 'O e-mail não pode exceder 255 caracteres',
+            'email.unique' => 'Este e-mail já está em uso',
+            'password.required' => 'A senha é obrigatória',
+            'password.confirmed' => 'A confirmação de senha não corresponde',
+            'tenant_name.required' => 'O nome da empresa é obrigatório',
+            'tenant_name.string' => 'O nome da empresa deve ser um texto',
+            'tenant_name.max' => 'O nome da empresa não pode exceder 255 caracteres',
         ];
     }
 
@@ -56,11 +56,11 @@ class RegisterRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'name' => 'name',
-            'email' => 'email',
-            'password' => 'password',
-            'password_confirmation' => 'password confirmation',
-            'tenant_name' => 'company name',
+            'name' => 'nome',
+            'email' => 'e-mail',
+            'password' => 'senha',
+            'password_confirmation' => 'confirmação de senha',
+            'tenant_name' => 'nome da empresa',
         ];
     }
 }

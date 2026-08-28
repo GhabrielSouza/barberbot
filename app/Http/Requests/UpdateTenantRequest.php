@@ -34,14 +34,14 @@ class UpdateTenantRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'name.required' => 'Tenant name is required',
-            'name.string' => 'Tenant name must be a string',
-            'name.max' => 'Tenant name cannot exceed 255 characters',
-            'segment.string' => 'Segment must be a string',
-            'city.string' => 'City must be a string',
-            'phone.string' => 'Phone must be a string',
-            'status.required' => 'Status is required',
-            'status.in' => 'Status must be one of: active, suspended, cancelled',
+            'name.required' => 'O nome do tenant é obrigatório',
+            'name.string' => 'O nome do tenant deve ser um texto',
+            'name.max' => 'O nome do tenant não pode exceder 255 caracteres',
+            'segment.string' => 'O segmento deve ser um texto',
+            'city.string' => 'A cidade deve ser um texto',
+            'phone.string' => 'O telefone deve ser um texto',
+            'status.required' => 'O status é obrigatório',
+            'status.in' => 'O status deve ser um dos seguintes: active, suspended, cancelled',
         ];
     }
 
@@ -51,10 +51,10 @@ class UpdateTenantRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'name' => 'name',
-            'segment' => 'segment',
-            'city' => 'city',
-            'phone' => 'phone',
+            'name' => 'nome',
+            'segment' => 'segmento',
+            'city' => 'cidade',
+            'phone' => 'telefone',
             'status' => 'status',
         ];
     }

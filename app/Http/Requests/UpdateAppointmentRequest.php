@@ -34,8 +34,8 @@ class UpdateAppointmentRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'status.required' => 'Status is required',
-            'status.in' => 'Status must be one of: pending, confirmed, canceled, completed',
+            'status.required' => 'O status é obrigatório',
+            'status.in' => 'O status deve ser um dos seguintes: pending, confirmed, canceled, completed',
         ];
     }
 

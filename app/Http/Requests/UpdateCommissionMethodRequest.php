@@ -39,14 +39,14 @@ class UpdateCommissionMethodRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'code.required' => 'Code is required',
-            'code.string' => 'Code must be a string',
-            'code.max' => 'Code cannot exceed 255 characters',
-            'code.unique' => 'This code is already in use',
-            'name.required' => 'Name is required',
-            'name.string' => 'Name must be a string',
-            'name.max' => 'Name cannot exceed 255 characters',
-            'description.string' => 'Description must be a string',
+            'code.required' => 'O código é obrigatório',
+            'code.string' => 'O código deve ser um texto',
+            'code.max' => 'O código não pode exceder 255 caracteres',
+            'code.unique' => 'Este código já está em uso',
+            'name.required' => 'O nome é obrigatório',
+            'name.string' => 'O nome deve ser um texto',
+            'name.max' => 'O nome não pode exceder 255 caracteres',
+            'description.string' => 'A descrição deve ser um texto',
         ];
     }
 
@@ -56,9 +56,9 @@ class UpdateCommissionMethodRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'code' => 'code',
-            'name' => 'name',
-            'description' => 'description',
+            'code' => 'código',
+            'name' => 'nome',
+            'description' => 'descrição',
         ];
     }
 }

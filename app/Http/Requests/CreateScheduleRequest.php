@@ -33,15 +33,15 @@ class CreateScheduleRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'day_of_week.required' => 'Day of week is required',
-            'day_of_week.integer' => 'Day of week must be an integer',
-            'day_of_week.min' => 'Day of week must be between 0-6',
-            'day_of_week.max' => 'Day of week must be between 0-6',
-            'start_time.required' => 'Start time is required',
-            'start_time.date_format' => 'Start time must be in format H:i',
-            'end_time.required' => 'End time is required',
-            'end_time.date_format' => 'End time must be in format H:i',
-            'end_time.after' => 'End time must be after start time',
+            'day_of_week.required' => 'O dia da semana é obrigatório',
+            'day_of_week.integer' => 'O dia da semana deve ser um número inteiro',
+            'day_of_week.min' => 'O dia da semana deve estar entre 0 e 6',
+            'day_of_week.max' => 'O dia da semana deve estar entre 0 e 6',
+            'start_time.required' => 'O horário de início é obrigatório',
+            'start_time.date_format' => 'O horário de início deve estar no formato HH:MM',
+            'end_time.required' => 'O horário de término é obrigatório',
+            'end_time.date_format' => 'O horário de término deve estar no formato HH:MM',
+            'end_time.after' => 'O horário de término deve ser depois do horário de início',
         ];
     }
 
@@ -51,9 +51,9 @@ class CreateScheduleRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'day_of_week' => 'day of week',
-            'start_time' => 'start time',
-            'end_time' => 'end time',
+            'day_of_week' => 'dia da semana',
+            'start_time' => 'horário de início',
+            'end_time' => 'horário de término',
         ];
     }
 }

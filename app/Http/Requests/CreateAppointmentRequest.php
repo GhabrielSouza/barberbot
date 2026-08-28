@@ -57,17 +57,17 @@ class CreateAppointmentRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'user_id.required' => 'User ID is required',
-            'user_id.exists' => 'The selected user does not exist',
-            'barber_id.required' => 'Barber ID is required',
-            'barber_id.exists' => 'The selected barber does not exist',
-            'service_id.required' => 'Service ID is required',
-            'service_id.exists' => 'The selected service does not exist',
-            'date.required' => 'Date is required',
-            'date.date_format' => 'Date must be in format Y-m-d',
-            'date.after_or_equal' => 'Date must be today or in the future',
-            'time.required' => 'Time is required',
-            'time.date_format' => 'Time must be in format H:i',
+            'user_id.required' => 'O cliente é obrigatório',
+            'user_id.exists' => 'O cliente selecionado não existe',
+            'barber_id.required' => 'O barbeiro é obrigatório',
+            'barber_id.exists' => 'O barbeiro selecionado não existe',
+            'service_id.required' => 'O serviço é obrigatório',
+            'service_id.exists' => 'O serviço selecionado não existe',
+            'date.required' => 'A data é obrigatória',
+            'date.date_format' => 'A data deve estar no formato AAAA-MM-DD',
+            'date.after_or_equal' => 'A data deve ser hoje ou uma data futura',
+            'time.required' => 'O horário é obrigatório',
+            'time.date_format' => 'O horário deve estar no formato HH:MM',
         ];
     }
 
@@ -77,11 +77,11 @@ class CreateAppointmentRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'user_id' => 'user',
-            'barber_id' => 'barber',
-            'service_id' => 'service',
-            'date' => 'date',
-            'time' => 'time',
+            'user_id' => 'cliente',
+            'barber_id' => 'barbeiro',
+            'service_id' => 'serviço',
+            'date' => 'data',
+            'time' => 'horário',
         ];
     }
 }

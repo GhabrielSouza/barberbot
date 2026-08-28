@@ -39,11 +39,11 @@ Route::get('status', function () {
 // Authentication routes for SPA/API (no CSRF required)
 Route::middleware(['api', \Illuminate\Session\Middleware\StartSession::class])->group(function () {
     Route::post('/login', [AuthenticatedSessionController::class, 'store'])
-        ->middleware('guest')
+        ->middleware('guest.api')
         ->name('api.login');
 
     Route::post('/register', [RegisteredUserController::class, 'store'])
-        ->middleware('guest')
+        ->middleware('guest.api')
         ->name('api.register');
 
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])

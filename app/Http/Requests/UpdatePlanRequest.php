@@ -35,21 +35,21 @@ class UpdatePlanRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'name.required' => 'Plan name is required',
-            'name.string' => 'Plan name must be a string',
-            'name.max' => 'Plan name cannot exceed 255 characters',
-            'price_month.required' => 'Monthly price is required',
-            'price_month.numeric' => 'Monthly price must be a number',
-            'price_month.min' => 'Monthly price cannot be negative',
-            'included_members.required' => 'Included members is required',
-            'included_members.integer' => 'Included members must be an integer',
-            'included_members.min' => 'Included members cannot be negative',
-            'price_per_extra_member.required' => 'Price per extra member is required',
-            'price_per_extra_member.numeric' => 'Price per extra member must be a number',
-            'price_per_extra_member.min' => 'Price per extra member cannot be negative',
-            'limits.array' => 'Limits must be an object',
-            'active.required' => 'Active field is required',
-            'active.boolean' => 'Active field must be a boolean',
+            'name.required' => 'O nome do plano é obrigatório',
+            'name.string' => 'O nome do plano deve ser um texto',
+            'name.max' => 'O nome do plano não pode exceder 255 caracteres',
+            'price_month.required' => 'O preço mensal é obrigatório',
+            'price_month.numeric' => 'O preço mensal deve ser um número',
+            'price_month.min' => 'O preço mensal não pode ser negativo',
+            'included_members.required' => 'A quantidade de membros inclusos é obrigatória',
+            'included_members.integer' => 'A quantidade de membros inclusos deve ser um número inteiro',
+            'included_members.min' => 'A quantidade de membros inclusos não pode ser negativa',
+            'price_per_extra_member.required' => 'O preço por membro extra é obrigatório',
+            'price_per_extra_member.numeric' => 'O preço por membro extra deve ser um número',
+            'price_per_extra_member.min' => 'O preço por membro extra não pode ser negativo',
+            'limits.array' => 'Os limites devem ser um objeto',
+            'active.required' => 'O campo ativo é obrigatório',
+            'active.boolean' => 'O campo ativo deve ser um booleano',
         ];
     }
 
@@ -59,12 +59,12 @@ class UpdatePlanRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'name' => 'name',
-            'price_month' => 'monthly price',
-            'included_members' => 'included members',
-            'price_per_extra_member' => 'price per extra member',
-            'limits' => 'limits',
-            'active' => 'active status',
+            'name' => 'nome',
+            'price_month' => 'preço mensal',
+            'included_members' => 'membros inclusos',
+            'price_per_extra_member' => 'preço por membro extra',
+            'limits' => 'limites',
+            'active' => 'status ativo',
         ];
     }
 }

@@ -41,16 +41,16 @@ class UpdateUserRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'name.required' => 'User name is required',
-            'name.string' => 'User name must be a string',
-            'name.max' => 'User name cannot exceed 255 characters',
-            'email.required' => 'Email is required',
-            'email.email' => 'Email must be a valid email address',
-            'email.unique' => 'This email is already in use',
-            'password.required' => 'Password is required',
-            'password.min' => 'Password must be at least 8 characters',
-            'role.required' => 'Role is required',
-            'role.in' => 'Role must be one of: owner, supervisor, atendente',
+            'name.required' => 'O nome do usuário é obrigatório',
+            'name.string' => 'O nome do usuário deve ser um texto',
+            'name.max' => 'O nome do usuário não pode exceder 255 caracteres',
+            'email.required' => 'O e-mail é obrigatório',
+            'email.email' => 'O e-mail deve ser um endereço válido',
+            'email.unique' => 'Este e-mail já está em uso',
+            'password.required' => 'A senha é obrigatória',
+            'password.min' => 'A senha deve ter no mínimo 8 caracteres',
+            'role.required' => 'A função é obrigatória',
+            'role.in' => 'A função deve ser uma das seguintes: owner, supervisor, atendente',
         ];
     }
 
@@ -60,10 +60,10 @@ class UpdateUserRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'name' => 'name',
-            'email' => 'email',
-            'password' => 'password',
-            'role' => 'role',
+            'name' => 'nome',
+            'email' => 'e-mail',
+            'password' => 'senha',
+            'role' => 'função',
         ];
     }
 }

@@ -35,19 +35,19 @@ class UpdateServiceRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'name.string' => 'Service name must be a string',
-            'name.max' => 'Service name cannot exceed 255 characters',
-            'price.numeric' => 'Price must be a number',
-            'price.min' => 'Price must be greater than or equal to 0',
-            'duration_minutes.integer' => 'Duration must be an integer',
-            'duration_minutes.min' => 'Duration must be at least 1 minute',
-            'duration_minutes.max' => 'Duration cannot exceed 480 minutes',
-            'duration_min.integer' => 'Duration must be an integer',
-            'duration_min.min' => 'Duration must be at least 1 minute',
-            'duration_min.max' => 'Duration cannot exceed 480 minutes',
-            'category.string' => 'Category must be a string',
-            'category.max' => 'Category cannot exceed 100 characters',
-            'active.boolean' => 'Active field must be a boolean',
+            'name.string' => 'O nome do serviço deve ser um texto',
+            'name.max' => 'O nome do serviço não pode exceder 255 caracteres',
+            'price.numeric' => 'O preço deve ser um número',
+            'price.min' => 'O preço deve ser maior ou igual a 0',
+            'duration_minutes.integer' => 'A duração deve ser um número inteiro',
+            'duration_minutes.min' => 'A duração deve ser de no mínimo 1 minuto',
+            'duration_minutes.max' => 'A duração não pode exceder 480 minutos',
+            'duration_min.integer' => 'A duração deve ser um número inteiro',
+            'duration_min.min' => 'A duração deve ser de no mínimo 1 minuto',
+            'duration_min.max' => 'A duração não pode exceder 480 minutos',
+            'category.string' => 'A categoria deve ser um texto',
+            'category.max' => 'A categoria não pode exceder 100 caracteres',
+            'active.boolean' => 'O campo ativo deve ser um booleano',
         ];
     }
 
@@ -57,12 +57,12 @@ class UpdateServiceRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'name' => 'name',
-            'price' => 'price',
-            'duration_minutes' => 'duration (minutes)',
-            'duration_min' => 'duration (minutes)',
-            'category' => 'category',
-            'active' => 'active status',
+            'name' => 'nome',
+            'price' => 'preço',
+            'duration_minutes' => 'duração (minutos)',
+            'duration_min' => 'duração (minutos)',
+            'category' => 'categoria',
+            'active' => 'status ativo',
         ];
     }
 }

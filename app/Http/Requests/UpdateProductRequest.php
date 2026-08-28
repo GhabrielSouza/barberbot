@@ -34,15 +34,15 @@ class UpdateProductRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'name.string' => 'Product name must be a string',
-            'name.max' => 'Product name cannot exceed 255 characters',
-            'price.numeric' => 'Price must be a number',
-            'price.min' => 'Price must be greater than or equal to 0',
-            'stock.integer' => 'Stock must be an integer',
-            'stock.min' => 'Stock cannot be negative',
-            'category.string' => 'Category must be a string',
-            'category.max' => 'Category cannot exceed 100 characters',
-            'active.boolean' => 'Active field must be a boolean',
+            'name.string' => 'O nome do produto deve ser um texto',
+            'name.max' => 'O nome do produto não pode exceder 255 caracteres',
+            'price.numeric' => 'O preço deve ser um número',
+            'price.min' => 'O preço deve ser maior ou igual a 0',
+            'stock.integer' => 'O estoque deve ser um número inteiro',
+            'stock.min' => 'O estoque não pode ser negativo',
+            'category.string' => 'A categoria deve ser um texto',
+            'category.max' => 'A categoria não pode exceder 100 caracteres',
+            'active.boolean' => 'O campo ativo deve ser um booleano',
         ];
     }
 
@@ -52,11 +52,11 @@ class UpdateProductRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'name' => 'name',
-            'price' => 'price',
-            'stock' => 'stock',
-            'category' => 'category',
-            'active' => 'active status',
+            'name' => 'nome',
+            'price' => 'preço',
+            'stock' => 'estoque',
+            'category' => 'categoria',
+            'active' => 'status ativo',
         ];
     }
 }
