@@ -72,11 +72,4 @@ class User extends Authenticatable
         return $this->belongsTo(Tenant::class);
     }
 
-    /**
-     * Get all messages for this user.
-     */
-    public function getAuthPassword(): string
-    {
-        return $this->password_hash;
-    }
 }
