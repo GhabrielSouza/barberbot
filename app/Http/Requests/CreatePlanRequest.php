@@ -51,4 +51,19 @@ class CreatePlanRequest extends FormRequest
             'active.boolean' => 'Active field must be a boolean',
         ];
     }
+
+    /**
+     * Get custom attributes for validator errors.
+     */
+    public function attributes(): array
+    {
+        return [
+            'name' => 'name',
+            'price_month' => 'monthly price',
+            'included_members' => 'included members',
+            'price_per_extra_member' => 'price per extra member',
+            'limits' => 'limits',
+            'active' => 'active status',
+        ];
+    }
 }

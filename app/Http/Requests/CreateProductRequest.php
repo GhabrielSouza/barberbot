@@ -47,4 +47,18 @@ class CreateProductRequest extends FormRequest
             'active.boolean' => 'Active field must be a boolean',
         ];
     }
+
+    /**
+     * Get custom attributes for validator errors.
+     */
+    public function attributes(): array
+    {
+        return [
+            'name' => 'name',
+            'price' => 'price',
+            'stock' => 'stock',
+            'category' => 'category',
+            'active' => 'active status',
+        ];
+    }
 }

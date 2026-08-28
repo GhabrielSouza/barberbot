@@ -38,4 +38,14 @@ class UpdateAppointmentRequest extends FormRequest
             'status.in' => 'Status must be one of: pending, confirmed, canceled, completed',
         ];
     }
+
+    /**
+     * Get custom attributes for validator errors.
+     */
+    public function attributes(): array
+    {
+        return [
+            'status' => 'status',
+        ];
+    }
 }

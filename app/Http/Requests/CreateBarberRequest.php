@@ -47,4 +47,19 @@ class CreateBarberRequest extends FormRequest
             'active.boolean' => 'Active field must be a boolean',
         ];
     }
+
+    /**
+     * Get custom attributes for validator errors.
+     */
+    public function attributes(): array
+    {
+        return [
+            'name' => 'name',
+            'role' => 'role',
+            'color' => 'color',
+            'is_admin' => 'admin flag',
+            'user_id' => 'user',
+            'active' => 'active status',
+        ];
+    }
 }

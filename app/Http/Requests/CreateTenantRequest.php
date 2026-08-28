@@ -43,4 +43,18 @@ class CreateTenantRequest extends FormRequest
             'status.in' => 'Status must be one of: active, suspended, cancelled',
         ];
     }
+
+    /**
+     * Get custom attributes for validator errors.
+     */
+    public function attributes(): array
+    {
+        return [
+            'name' => 'name',
+            'segment' => 'segment',
+            'city' => 'city',
+            'phone' => 'phone',
+            'status' => 'status',
+        ];
+    }
 }

@@ -70,4 +70,18 @@ class CreateAppointmentRequest extends FormRequest
             'time.date_format' => 'Time must be in format H:i',
         ];
     }
+
+    /**
+     * Get custom attributes for validator errors.
+     */
+    public function attributes(): array
+    {
+        return [
+            'user_id' => 'user',
+            'barber_id' => 'barber',
+            'service_id' => 'service',
+            'date' => 'date',
+            'time' => 'time',
+        ];
+    }
 }

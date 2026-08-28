@@ -49,4 +49,16 @@ class UpdateCommissionMethodRequest extends FormRequest
             'description.string' => 'Description must be a string',
         ];
     }
+
+    /**
+     * Get custom attributes for validator errors.
+     */
+    public function attributes(): array
+    {
+        return [
+            'code' => 'code',
+            'name' => 'name',
+            'description' => 'description',
+        ];
+    }
 }

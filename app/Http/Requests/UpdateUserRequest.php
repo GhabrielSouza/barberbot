@@ -53,4 +53,17 @@ class UpdateUserRequest extends FormRequest
             'role.in' => 'Role must be one of: owner, supervisor, atendente',
         ];
     }
+
+    /**
+     * Get custom attributes for validator errors.
+     */
+    public function attributes(): array
+    {
+        return [
+            'name' => 'name',
+            'email' => 'email',
+            'password' => 'password',
+            'role' => 'role',
+        ];
+    }
 }

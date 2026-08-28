@@ -44,4 +44,16 @@ class CreateScheduleRequest extends FormRequest
             'end_time.after' => 'End time must be after start time',
         ];
     }
+
+    /**
+     * Get custom attributes for validator errors.
+     */
+    public function attributes(): array
+    {
+        return [
+            'day_of_week' => 'day of week',
+            'start_time' => 'start time',
+            'end_time' => 'end time',
+        ];
+    }
 }
