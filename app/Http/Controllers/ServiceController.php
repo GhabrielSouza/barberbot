@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\CreateServiceRequest;
 use App\Http\Requests\UpdateServiceRequest;
 use App\Http\Resources\ServiceResource;
-use App\Models\Company;
 use App\Models\Service;
+use App\Models\Tenant;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
@@ -18,7 +18,7 @@ class ServiceController extends Controller
      * The current tenant schema does not include company_id in services,
      * so the list is not filtered by foreign key.
      */
-    public function index(Company $company): AnonymousResourceCollection
+    public function index(Tenant $company): AnonymousResourceCollection
     {
         $services = Service::query()
             ->orderBy('name')
@@ -30,7 +30,7 @@ class ServiceController extends Controller
     /**
      * Get active services only.
      */
-    public function active(Company $company): AnonymousResourceCollection
+    public function active(Tenant $company): AnonymousResourceCollection
     {
         $services = Service::query()
             ->where('active', true)
@@ -43,7 +43,7 @@ class ServiceController extends Controller
     /**
      * Create a new service.
      */
-    public function store(CreateServiceRequest $request, Company $company): ServiceResource
+    public function store(CreateServiceRequest $request, Tenant $company): ServiceResource
     {
         $duration = $request->input('duration_minutes', $request->input('duration_min', 0));
 
@@ -61,7 +61,7 @@ class ServiceController extends Controller
     /**
      * Get service details.
      */
-    public function show(Company $company, Service $service): ServiceResource
+    public function show(Tenant $company, Service $service): ServiceResource
     {
         return new ServiceResource($service);
     }
@@ -69,7 +69,7 @@ class ServiceController extends Controller
     /**
      * Update service.
      */
-    public function update(UpdateServiceRequest $request, Company $company, Service $service): ServiceResource
+    public function update(UpdateServiceRequest $request, Tenant $company, Service $service): ServiceResource
     {
         $data = $request->all();
 
@@ -86,9 +86,9 @@ class ServiceController extends Controller
     /**
      * Toggle service active status.
      */
-    public function toggleActive(Company $company, Service $service): JsonResponse
+    public function toggleActive(Tenant $company, Service $service): JsonResponse
     {
-        $service->update(['active' => !$service->active]);
+        $service->update(['active' => ! $service->active]);
 
         return response()->json([
             'success' => true,
@@ -100,7 +100,7 @@ class ServiceController extends Controller
     /**
      * Delete service.
      */
-    public function destroy(Company $company, Service $service): JsonResponse
+    public function destroy(Tenant $company, Service $service): JsonResponse
     {
         $service->delete();
 

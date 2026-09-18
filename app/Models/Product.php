@@ -10,6 +10,8 @@ class Product extends Model
 {
     use HasFactory;
 
+    protected $connection = 'tenant';
+
     public $incrementing = false;
 
     protected $keyType = 'string';

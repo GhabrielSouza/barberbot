@@ -1,8 +1,14 @@
 <?php
 
+use App\Http\Middleware\EnsureApiGuest;
+use App\Http\Middleware\EnsureEmailIsVerified;
+use App\Http\Middleware\ForceJsonResponse;
+use App\Http\Middleware\IdentifyTenant;
+use App\Http\Middleware\ResolveTenantFromUser;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Routing\Middleware\SubstituteBindings;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -13,18 +19,21 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->api(prepend: [
-            \App\Http\Middleware\ForceJsonResponse::class,
-            \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+            ForceJsonResponse::class,
         ]);
 
         $middleware->alias([
-            'verified'             => \App\Http\Middleware\EnsureEmailIsVerified::class,
-            'identify.tenant'      => \App\Http\Middleware\IdentifyTenant::class,
-            'resolve.tenant.user'  => \App\Http\Middleware\ResolveTenantFromUser::class,
-            'guest.api'            => \App\Http\Middleware\EnsureApiGuest::class,
+            'verified' => EnsureEmailIsVerified::class,
+            'identify.tenant' => IdentifyTenant::class,
+            'resolve.tenant.user' => ResolveTenantFromUser::class,
+            'guest.api' => EnsureApiGuest::class,
         ]);
 
-        //
+        // Select the tenant connection before implicit resource bindings run.
+        $middleware->prependToPriorityList(
+            SubstituteBindings::class,
+            ResolveTenantFromUser::class,
+        );
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

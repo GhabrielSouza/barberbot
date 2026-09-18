@@ -13,9 +13,11 @@ class ServiceCrudTest extends TestCase
     {
         parent::setUp();
 
-        Schema::dropIfExists('services');
+        config(['database.connections.tenant' => config('database.connections.sqlite')]);
 
-        Schema::create('services', function (Blueprint $table) {
+        Schema::connection('tenant')->dropIfExists('services');
+
+        Schema::connection('tenant')->create('services', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('name');
             $table->integer('duration_min');
@@ -39,7 +41,7 @@ class ServiceCrudTest extends TestCase
         $this->assertDatabaseHas('services', [
             'id' => $service->id,
             'name' => 'Corte Clássico',
-        ]);
+        ], 'tenant');
 
         $this->assertSame(45, Service::find($service->id)->duration_min);
     }

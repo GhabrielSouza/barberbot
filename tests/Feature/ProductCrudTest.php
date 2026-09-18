@@ -13,9 +13,11 @@ class ProductCrudTest extends TestCase
     {
         parent::setUp();
 
-        Schema::dropIfExists('products');
+        config(['database.connections.tenant' => config('database.connections.sqlite')]);
 
-        Schema::create('products', function (Blueprint $table) {
+        Schema::connection('tenant')->dropIfExists('products');
+
+        Schema::connection('tenant')->create('products', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('name');
             $table->decimal('price', 10, 2);
@@ -39,7 +41,7 @@ class ProductCrudTest extends TestCase
         $this->assertDatabaseHas('products', [
             'id' => $product->id,
             'name' => 'Pomada Modeladora',
-        ]);
+        ], 'tenant');
 
         $this->assertSame('Pomada Modeladora', Product::find($product->id)->name);
     }

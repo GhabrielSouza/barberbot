@@ -45,12 +45,25 @@ class ResolveTenantFromUser
             ], 403);
         }
 
+        // The legacy companies URL now carries the authenticated tenant UUID.
+        if ((string) $request->route('company') !== (string) $tenant->id) {
+            abort(403, 'O tenant da URL não pertence ao usuário autenticado.');
+        }
+
+        $originalConnection = config('database.connections.tenant');
         $this->pointConnectionTo($tenant->schema_name);
+        $request->route()->setParameter('company', $tenant);
 
         $request->attributes->set('tenant', $tenant);
         app()->instance('current_tenant', $tenant);
 
-        return $next($request);
+        try {
+            return $next($request);
+        } finally {
+            Config::set('database.connections.tenant', $originalConnection);
+            DB::purge('tenant');
+            app()->forgetInstance('current_tenant');
+        }
     }
 
     /**

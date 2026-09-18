@@ -4,9 +4,16 @@ Base URL: `{APP_URL}/api`
 
 ## Autenticação
 
-A API usa **autenticação por sessão** (Laravel + Sanctum SPA/stateful), não Bearer token. O client precisa manter cookies entre requests (cookie jar habilitado). Rotas marcadas como 🔒 exigem sessão autenticada (`auth`).
+A API usa **autenticação por sessão/cookies**, não Bearer token. Login, cadastro, logout e rotas protegidas compartilham o middleware `web`: cookies criptografados, sessão e proteção CSRF, independentemente do header `Origin`.
 
-Para rotas fora do grupo de auth que dependem de `EnsureFrontendRequestsAreStateful` (as protegidas por `auth` dentro do grupo `companies/{company}/...`), o client deve enviar um header `Origin`/`Referer` que bata com `SANCTUM_STATEFUL_DOMAINS` no `.env`.
+No Postman:
+1. Faça `GET /sanctum/csrf-cookie` (fora do prefixo `/api`). O vhost deve encaminhar essa rota ao mesmo Laravel.
+2. Mantenha os cookies automáticos. No `POST /api/login`, envie email/senha em JSON e `X-XSRF-TOKEN` com apenas o valor do cookie `XSRF-TOKEN`, decodificado de URL.
+3. Mantenha os cookies nas próximas chamadas. `GET` não precisa do header CSRF; requisições de escrita precisam do token atual. O login regenera o token, então leia novamente o cookie antes da próxima escrita.
+
+No frontend, habilite credenciais e envio do token XSRF no cliente HTTP. Use HTTPS em produção e preserve a `APP_KEY` existente.
+
+O parâmetro legado `/api/companies/{company}` recebe agora o **UUID `tenant.id` retornado no login**. Ele precisa corresponder ao tenant ativo do usuário; outro tenant retorna `403`. As consultas do dashboard usam o schema desse tenant, clientes em `clients`, profissionais em `team_members`, status concluído `done` e preço histórico de `appointments.price`.
 
 ---
 
@@ -236,7 +243,7 @@ CRUD da empresa/assinante. Ao criar, o schema Postgres do tenant é provisionado
 
 ## Rotas de negócio (schema do tenant — exigem 🔒 `auth`)
 
-Todas abaixo ficam sob `Route::middleware(['api', 'auth'])` e usam o prefixo `companies/{company}`.
+Todas abaixo ficam sob `Route::middleware(['web', 'auth', 'resolve.tenant.user'])` e usam o prefixo `companies/{company}`.
 
 ### Dashboard
 

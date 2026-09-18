@@ -6,7 +6,7 @@ use App\Http\Requests\CreateAppointmentRequest;
 use App\Http\Requests\UpdateAppointmentRequest;
 use App\Http\Resources\AppointmentResource;
 use App\Models\Appointment;
-use App\Models\Company;
+use App\Models\Tenant;
 use App\Services\AppointmentService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -22,11 +22,8 @@ class AppointmentController extends Controller
 
     /**
      * List all appointments for a company
-     *
-     * @param Company $company
-     * @return AnonymousResourceCollection
      */
-    public function index(Company $company): AnonymousResourceCollection
+    public function index(Tenant $company): AnonymousResourceCollection
     {
         $appointments = Appointment::where('company_id', $company->id)
             ->with(['user', 'barber', 'service'])
@@ -38,24 +35,20 @@ class AppointmentController extends Controller
 
     /**
      * Get today's appointments
-     *
-     * @param Company $company
-     * @return AnonymousResourceCollection
      */
-    public function today(Company $company): AnonymousResourceCollection
+    public function today(Tenant $company): AnonymousResourceCollection
     {
         $appointments = $this->appointmentService->getTodayAppointments($company->id);
+
         return AppointmentResource::collection($appointments);
     }
 
     /**
      * Create a new appointment
      *
-     * @param CreateAppointmentRequest $request
-     * @param Company $company
      * @return AppointmentResource|JsonResponse
      */
-    public function store(CreateAppointmentRequest $request, Company $company)
+    public function store(CreateAppointmentRequest $request, Tenant $company)
     {
         try {
             $appointment = $this->appointmentService->createAppointment(
@@ -80,30 +73,24 @@ class AppointmentController extends Controller
 
     /**
      * Get appointment details
-     *
-     * @param Company $company
-     * @param Appointment $appointment
-     * @return AppointmentResource
      */
-    public function show(Company $company, Appointment $appointment): AppointmentResource
+    public function show(Tenant $company, Appointment $appointment): AppointmentResource
     {
         if ($appointment->company_id !== $company->id) {
             abort(403);
         }
 
         $appointment->load(['user', 'barber', 'service']);
+
         return new AppointmentResource($appointment);
     }
 
     /**
      * Update appointment status
      *
-     * @param UpdateAppointmentRequest $request
-     * @param Company $company
-     * @param Appointment $appointment
      * @return AppointmentResource|JsonResponse
      */
-    public function update(UpdateAppointmentRequest $request, Company $company, Appointment $appointment)
+    public function update(UpdateAppointmentRequest $request, Tenant $company, Appointment $appointment)
     {
         if ($appointment->company_id !== $company->id) {
             abort(403);
@@ -118,6 +105,7 @@ class AppointmentController extends Controller
             };
 
             $appointment->load(['user', 'barber', 'service']);
+
             return new AppointmentResource($appointment);
         } catch (\Exception $e) {
             return response()->json([
@@ -129,12 +117,8 @@ class AppointmentController extends Controller
 
     /**
      * Cancel appointment
-     *
-     * @param Company $company
-     * @param Appointment $appointment
-     * @return JsonResponse
      */
-    public function cancel(Company $company, Appointment $appointment): JsonResponse
+    public function cancel(Tenant $company, Appointment $appointment): JsonResponse
     {
         if ($appointment->company_id !== $company->id) {
             abort(403);
@@ -150,12 +134,8 @@ class AppointmentController extends Controller
 
     /**
      * Delete appointment
-     *
-     * @param Company $company
-     * @param Appointment $appointment
-     * @return JsonResponse
      */
-    public function destroy(Company $company, Appointment $appointment): JsonResponse
+    public function destroy(Tenant $company, Appointment $appointment): JsonResponse
     {
         if ($appointment->company_id !== $company->id) {
             abort(403);

@@ -6,8 +6,8 @@ use App\Http\Requests\CreateScheduleRequest;
 use App\Http\Requests\UpdateScheduleRequest;
 use App\Http\Resources\ScheduleResource;
 use App\Models\Barber;
-use App\Models\Company;
 use App\Models\Schedule;
+use App\Models\Tenant;
 use App\Services\ScheduleService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -23,25 +23,16 @@ class ScheduleController extends Controller
 
     /**
      * Get schedules for a barber
-     *
-     * @param Company $company
-     * @param Barber $barber
-     * @return AnonymousResourceCollection
      */
-    public function indexForBarber(Company $company, Barber $barber): AnonymousResourceCollection
+    public function indexForBarber(Tenant $company, Barber $barber): AnonymousResourceCollection
     {
         return ScheduleResource::collection($this->scheduleService->listByBarber($barber));
     }
 
     /**
      * Create schedule for a barber
-     *
-     * @param CreateScheduleRequest $request
-     * @param Company $company
-     * @param Barber $barber
-     * @return ScheduleResource
      */
-    public function store(CreateScheduleRequest $request, Company $company, Barber $barber): ScheduleResource
+    public function store(CreateScheduleRequest $request, Tenant $company, Barber $barber): ScheduleResource
     {
         $schedule = $this->scheduleService->createSchedule($barber, $request->validated());
 
@@ -50,29 +41,18 @@ class ScheduleController extends Controller
 
     /**
      * Get schedule details
-     *
-     * @param Company $company
-     * @param Barber $barber
-     * @param Schedule $schedule
-     * @return ScheduleResource
      */
-    public function show(Company $company, Barber $barber, Schedule $schedule): ScheduleResource
+    public function show(Tenant $company, Barber $barber, Schedule $schedule): ScheduleResource
     {
         return new ScheduleResource($schedule);
     }
 
     /**
      * Update schedule
-     *
-     * @param UpdateScheduleRequest $request
-     * @param Company $company
-     * @param Barber $barber
-     * @param Schedule $schedule
-     * @return ScheduleResource
      */
     public function update(
         UpdateScheduleRequest $request,
-        Company $company,
+        Tenant $company,
         Barber $barber,
         Schedule $schedule
     ): ScheduleResource {
@@ -83,13 +63,8 @@ class ScheduleController extends Controller
 
     /**
      * Delete schedule
-     *
-     * @param Company $company
-     * @param Barber $barber
-     * @param Schedule $schedule
-     * @return JsonResponse
      */
-    public function destroy(Company $company, Barber $barber, Schedule $schedule): JsonResponse
+    public function destroy(Tenant $company, Barber $barber, Schedule $schedule): JsonResponse
     {
         $this->scheduleService->deleteSchedule($schedule);
 
@@ -102,24 +77,17 @@ class ScheduleController extends Controller
     /**
      * Get schedules by day of week
      *
-     * @param Company $company
-     * @param Barber $barber
-     * @param int $day (0-6)
-     * @return AnonymousResourceCollection
+     * @param  int  $day  (0-6)
      */
-    public function byDay(Company $company, Barber $barber, int $day): AnonymousResourceCollection
+    public function byDay(Tenant $company, Barber $barber, int $day): AnonymousResourceCollection
     {
         return ScheduleResource::collection($this->scheduleService->listByDay($barber, $day));
     }
 
     /**
      * Bulk create schedules for a barber
-     *
-     * @param Company $company
-     * @param Barber $barber
-     * @return JsonResponse
      */
-    public function bulkCreate(Company $company, Barber $barber): JsonResponse
+    public function bulkCreate(Tenant $company, Barber $barber): JsonResponse
     {
         $request = request();
         $schedulesData = $request->input('schedules', []);
@@ -139,4 +107,3 @@ class ScheduleController extends Controller
         ]);
     }
 }
-

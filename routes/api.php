@@ -1,28 +1,27 @@
 <?php
 
+use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
-use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\BarberController;
+use App\Http\Controllers\CommissionMethodController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PlanController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ScheduleController;
-use App\Http\Controllers\CommissionMethodController;
-use App\Http\Controllers\PlanController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\TenantController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WhatsAppController;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use Carbon\Carbon;
 
 // Public Routes
 Route::prefix('webhook')->group(function () {
     Route::post('whatsapp', [WhatsAppController::class, 'webhook']);
     Route::get('test', [WhatsAppController::class, 'test']);
 
-    
 });
 
 Route::get('status', function () {
@@ -36,8 +35,8 @@ Route::get('status', function () {
     ]);
 });
 
-// Authentication routes for SPA/API (no CSRF required)
-Route::middleware(['api', \Illuminate\Session\Middleware\StartSession::class])->group(function () {
+// Cookie authentication: use the same session and CSRF stack as protected routes.
+Route::middleware(['web'])->group(function () {
     Route::post('/login', [AuthenticatedSessionController::class, 'store'])
         ->middleware('guest.api')
         ->name('api.login');
@@ -99,7 +98,7 @@ Route::middleware(['api'])->prefix('tenants/{tenant}')->group(function () {
 });
 
 // Routes that require authentication
-Route::middleware(['api', 'auth'])->group(function () {
+Route::middleware(['web', 'auth', 'resolve.tenant.user'])->group(function () {
     // Dashboard Routes
     Route::prefix('companies/{company}')->group(function () {
         Route::prefix('dashboard')->group(function () {
@@ -167,6 +166,3 @@ Route::middleware(['api', 'auth'])->group(function () {
         });
     });
 });
-
-
-

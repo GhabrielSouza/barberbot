@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\CreateProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use App\Http\Resources\ProductResource;
-use App\Models\Company;
 use App\Models\Product;
+use App\Models\Tenant;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
@@ -19,7 +19,7 @@ class ProductController extends Controller
      * products, so the CRUD is scoped by the route context but not filtered
      * by a company foreign key.
      */
-    public function index(Company $company): AnonymousResourceCollection
+    public function index(Tenant $company): AnonymousResourceCollection
     {
         $products = Product::query()
             ->orderBy('name')
@@ -31,7 +31,7 @@ class ProductController extends Controller
     /**
      * Get active products only.
      */
-    public function active(Company $company): AnonymousResourceCollection
+    public function active(Tenant $company): AnonymousResourceCollection
     {
         $products = Product::query()
             ->where('active', true)
@@ -44,7 +44,7 @@ class ProductController extends Controller
     /**
      * Create a new product.
      */
-    public function store(CreateProductRequest $request, Company $company): ProductResource
+    public function store(CreateProductRequest $request, Tenant $company): ProductResource
     {
         $product = Product::create([
             'name' => $request->name,
@@ -60,7 +60,7 @@ class ProductController extends Controller
     /**
      * Get product details.
      */
-    public function show(Company $company, Product $product): ProductResource
+    public function show(Tenant $company, Product $product): ProductResource
     {
         return new ProductResource($product);
     }
@@ -68,7 +68,7 @@ class ProductController extends Controller
     /**
      * Update a product.
      */
-    public function update(UpdateProductRequest $request, Company $company, Product $product): ProductResource
+    public function update(UpdateProductRequest $request, Tenant $company, Product $product): ProductResource
     {
         $product->update($request->only(['name', 'price', 'stock', 'category', 'active']));
 
@@ -78,9 +78,9 @@ class ProductController extends Controller
     /**
      * Toggle product active status.
      */
-    public function toggleActive(Company $company, Product $product): JsonResponse
+    public function toggleActive(Tenant $company, Product $product): JsonResponse
     {
-        $product->update(['active' => !$product->active]);
+        $product->update(['active' => ! $product->active]);
 
         return response()->json([
             'success' => true,
@@ -92,7 +92,7 @@ class ProductController extends Controller
     /**
      * Delete product.
      */
-    public function destroy(Company $company, Product $product): JsonResponse
+    public function destroy(Tenant $company, Product $product): JsonResponse
     {
         $product->delete();
 

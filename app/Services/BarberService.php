@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Models\Barber;
-use App\Models\Company;
+use App\Models\Tenant;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -11,12 +11,8 @@ class BarberService
 {
     /**
      * List all barbers for the current tenant schema.
-     *
-     * @param Company $company
-     * @param int $perPage
-     * @return LengthAwarePaginator
      */
-    public function listBarbers(Company $company, int $perPage = 15): LengthAwarePaginator
+    public function listBarbers(Tenant $company, int $perPage = 15): LengthAwarePaginator
     {
         return Barber::with('schedules')
             ->orderBy('name')
@@ -25,11 +21,8 @@ class BarberService
 
     /**
      * Get active barbers for the current tenant schema.
-     *
-     * @param Company $company
-     * @return Collection
      */
-    public function listActiveBarbers(Company $company): Collection
+    public function listActiveBarbers(Tenant $company): Collection
     {
         return Barber::where('active', true)
             ->with('schedules')
@@ -39,12 +32,8 @@ class BarberService
 
     /**
      * Create a new barber.
-     *
-     * @param Company $company
-     * @param array $data
-     * @return Barber
      */
-    public function createBarber(Company $company, array $data): Barber
+    public function createBarber(Tenant $company, array $data): Barber
     {
         $payload = array_merge([
             'active' => true,
@@ -63,13 +52,8 @@ class BarberService
 
     /**
      * Update an existing barber.
-     *
-     * @param Company $company
-     * @param Barber $barber
-     * @param array $data
-     * @return Barber
      */
-    public function updateBarber(Company $company, Barber $barber, array $data): Barber
+    public function updateBarber(Tenant $company, Barber $barber, array $data): Barber
     {
         $barber->update(array_intersect_key($data, array_flip([
             'name',
@@ -85,26 +69,18 @@ class BarberService
 
     /**
      * Toggle the active status of a barber.
-     *
-     * @param Company $company
-     * @param Barber $barber
-     * @return Barber
      */
-    public function toggleActive(Company $company, Barber $barber): Barber
+    public function toggleActive(Tenant $company, Barber $barber): Barber
     {
-        $barber->update(['active' => !$barber->active]);
+        $barber->update(['active' => ! $barber->active]);
 
         return $barber;
     }
 
     /**
      * Delete a barber.
-     *
-     * @param Company $company
-     * @param Barber $barber
-     * @return bool|null
      */
-    public function deleteBarber(Company $company, Barber $barber): ?bool
+    public function deleteBarber(Tenant $company, Barber $barber): ?bool
     {
         return $barber->delete();
     }
