@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Schedule extends Model
 {
-    use HasFactory;
+    use HasFactory, \Illuminate\Database\Eloquent\Concerns\HasUuids;
 
     protected $connection = 'tenant';
 
@@ -19,7 +19,7 @@ class Schedule extends Model
         'end_time',
     ];
 
-    public $timestamps = true;
+    protected $casts = ['day_of_week' => 'integer'];
 
     /**
      * Get the barber that owns this schedule

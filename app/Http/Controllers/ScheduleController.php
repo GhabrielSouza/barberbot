@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\BulkScheduleRequest;
 use App\Http\Requests\CreateScheduleRequest;
 use App\Http\Requests\UpdateScheduleRequest;
 use App\Http\Resources\ScheduleResource;
@@ -44,6 +45,8 @@ class ScheduleController extends Controller
      */
     public function show(Tenant $company, Barber $barber, Schedule $schedule): ScheduleResource
     {
+        abort_unless($schedule->barber_id === $barber->id, 404);
+
         return new ScheduleResource($schedule);
     }
 
@@ -56,6 +59,8 @@ class ScheduleController extends Controller
         Barber $barber,
         Schedule $schedule
     ): ScheduleResource {
+        abort_unless($schedule->barber_id === $barber->id, 404);
+
         $schedule = $this->scheduleService->updateSchedule($schedule, $request->validated());
 
         return new ScheduleResource($schedule);
@@ -66,6 +71,8 @@ class ScheduleController extends Controller
      */
     public function destroy(Tenant $company, Barber $barber, Schedule $schedule): JsonResponse
     {
+        abort_unless($schedule->barber_id === $barber->id, 404);
+
         $this->scheduleService->deleteSchedule($schedule);
 
         return response()->json([
@@ -81,25 +88,17 @@ class ScheduleController extends Controller
      */
     public function byDay(Tenant $company, Barber $barber, int $day): AnonymousResourceCollection
     {
+        abort_unless($day >= 0 && $day <= 6, 422);
+
         return ScheduleResource::collection($this->scheduleService->listByDay($barber, $day));
     }
 
     /**
      * Bulk create schedules for a barber
      */
-    public function bulkCreate(Tenant $company, Barber $barber): JsonResponse
+    public function bulkCreate(BulkScheduleRequest $request, Tenant $company, Barber $barber): JsonResponse
     {
-        $request = request();
-        $schedulesData = $request->input('schedules', []);
-
-        if (empty($schedulesData)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'No schedules provided',
-            ], 422);
-        }
-
-        $this->scheduleService->bulkCreateSchedules($barber, $schedulesData);
+        $this->scheduleService->bulkCreateSchedules($barber, $request->validated()['schedules']);
 
         return response()->json([
             'success' => true,

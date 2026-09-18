@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Validator;
 
 class UpdateScheduleRequest extends FormRequest
 {
@@ -22,8 +23,23 @@ class UpdateScheduleRequest extends FormRequest
         return [
             'day_of_week' => ['sometimes', 'required', 'integer', 'min:0', 'max:6'],
             'start_time' => ['sometimes', 'required', 'date_format:H:i'],
-            'end_time' => ['sometimes', 'required', 'date_format:H:i', 'after:start_time'],
+            'end_time' => ['sometimes', 'required', 'date_format:H:i'],
         ];
+    }
+
+    public function after(): array
+    {
+        return [function (Validator $validator) {
+            if ($validator->errors()->isNotEmpty()) {
+                return;
+            }
+            $schedule = $this->route('schedule');
+            $start = $this->input('start_time', substr($schedule->start_time, 0, 5));
+            $end = $this->input('end_time', substr($schedule->end_time, 0, 5));
+            if ($end <= $start) {
+                $validator->errors()->add('end_time', 'O horário de término deve ser depois do horário de início.');
+            }
+        }];
     }
 
     /**

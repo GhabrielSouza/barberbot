@@ -5,14 +5,12 @@ namespace App\Services;
 use App\Models\Barber;
 use App\Models\Schedule;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\DB;
 
 class ScheduleService
 {
     /**
      * List schedules for a barber.
-     *
-     * @param Barber $barber
-     * @return Collection
      */
     public function listByBarber(Barber $barber): Collection
     {
@@ -24,10 +22,6 @@ class ScheduleService
 
     /**
      * Get schedules for a specific day of week.
-     *
-     * @param Barber $barber
-     * @param int $dayOfWeek
-     * @return Collection
      */
     public function listByDay(Barber $barber, int $dayOfWeek): Collection
     {
@@ -39,10 +33,6 @@ class ScheduleService
 
     /**
      * Create a new schedule for a barber.
-     *
-     * @param Barber $barber
-     * @param array $data
-     * @return Schedule
      */
     public function createSchedule(Barber $barber, array $data): Schedule
     {
@@ -56,10 +46,6 @@ class ScheduleService
 
     /**
      * Update an existing schedule.
-     *
-     * @param Schedule $schedule
-     * @param array $data
-     * @return Schedule
      */
     public function updateSchedule(Schedule $schedule, array $data): Schedule
     {
@@ -74,9 +60,6 @@ class ScheduleService
 
     /**
      * Delete a schedule.
-     *
-     * @param Schedule $schedule
-     * @return bool|null
      */
     public function deleteSchedule(Schedule $schedule): ?bool
     {
@@ -85,22 +68,18 @@ class ScheduleService
 
     /**
      * Bulk create schedules for a barber (replaces existing).
-     *
-     * @param Barber $barber
-     * @param array $schedulesData
-     * @return Collection
      */
     public function bulkCreateSchedules(Barber $barber, array $schedulesData): Collection
     {
-        // Delete existing schedules
-        Schedule::where('barber_id', $barber->id)->delete();
+        return DB::connection('tenant')->transaction(function () use ($barber, $schedulesData) {
+            Barber::whereKey($barber->id)->lockForUpdate()->firstOrFail();
+            Schedule::where('barber_id', $barber->id)->delete();
+            $created = [];
+            foreach ($schedulesData as $data) {
+                $created[] = $this->createSchedule($barber, $data);
+            }
 
-        // Create new schedules
-        $created = [];
-        foreach ($schedulesData as $data) {
-            $created[] = $this->createSchedule($barber, $data);
-        }
-
-        return collect($created);
+            return new Collection($created);
+        });
     }
 }
