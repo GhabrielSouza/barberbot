@@ -10,6 +10,8 @@ class Appointment extends Model
 {
     use HasFactory;
 
+    protected $connection = 'tenant';
+
     protected $fillable = [
         'user_id',
         'barber_id',
