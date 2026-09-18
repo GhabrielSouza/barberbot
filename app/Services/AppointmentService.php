@@ -8,6 +8,8 @@ use App\Models\Service;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class AppointmentService
 {
@@ -18,15 +20,41 @@ class AppointmentService
         $this->availabilityService = $availabilityService;
     }
 
+    public function createForTenant(array $data): Appointment
+    {
+        return DB::connection('tenant')->transaction(function () use ($data) {
+            // Serialize bookings for this professional before checking overlaps.
+            Barber::whereKey($data['team_member_id'])->lockForUpdate()->firstOrFail();
+            $service = Service::findOrFail($data['service_id']);
+            $start = Carbon::parse($data['date'].' '.$data['start_time']);
+            $end = $start->copy()->addMinutes($service->duration_min);
+            if ($service->duration_min < 1 || ! $start->isSameDay($end)) {
+                throw ValidationException::withMessages([
+                    'start_time' => 'O serviço deve terminar no mesmo dia e ter duração válida.',
+                ]);
+            }
+            $conflict = Appointment::where('team_member_id', $data['team_member_id'])
+                ->whereDate('date', $data['date'])->where('status', '!=', 'cancelled')
+                ->where('start_time', '<', $end->format('H:i:s'))
+                ->where('end_time', '>', $start->format('H:i:s'))->exists();
+            if ($conflict) {
+                throw ValidationException::withMessages([
+                    'start_time' => 'O horário selecionado já está ocupado.',
+                ]);
+            }
+
+            return Appointment::create([
+                'client_id' => $data['client_id'], 'team_member_id' => $data['team_member_id'],
+                'service_id' => $service->id, 'service_name' => $service->name, 'price' => $service->price,
+                'date' => $data['date'], 'start_time' => $start->format('H:i:s'),
+                'end_time' => $end->format('H:i:s'), 'status' => 'confirmed',
+            ]);
+        });
+    }
+
     /**
      * Create an appointment with validation
      *
-     * @param User $user
-     * @param Barber $barber
-     * @param Service $service
-     * @param Carbon $date
-     * @param string $time
-     * @return Appointment
      * @throws \Exception
      */
     public function createAppointment(User $user, Barber $barber, Service $service, Carbon $date, string $time): Appointment
@@ -37,7 +65,7 @@ class AppointmentService
         }
 
         // Validate slots availability
-        if (!$this->availabilityService->isSlotAvailable($barber, $date, $time, $service)) {
+        if (! $this->availabilityService->isSlotAvailable($barber, $date, $time, $service)) {
             throw new \Exception('Selected time slot is not available');
         }
 
@@ -66,80 +94,63 @@ class AppointmentService
 
     /**
      * Confirm an appointment
-     *
-     * @param Appointment $appointment
-     * @return Appointment
      */
     public function confirmAppointment(Appointment $appointment): Appointment
     {
         $appointment->update(['status' => 'confirmed']);
+
         return $appointment;
     }
 
     /**
      * Cancel an appointment
-     *
-     * @param Appointment $appointment
-     * @return Appointment
      */
     public function cancelAppointment(Appointment $appointment): Appointment
     {
-        $appointment->update(['status' => 'canceled']);
+        $appointment->update(['status' => 'cancelled']);
+
         return $appointment;
     }
 
     /**
      * Complete an appointment
-     *
-     * @param Appointment $appointment
-     * @return Appointment
      */
     public function completeAppointment(Appointment $appointment): Appointment
     {
-        $appointment->update(['status' => 'completed']);
+        $appointment->update(['status' => 'done']);
+
         return $appointment;
     }
 
     /**
      * Get today's appointments for a company
      *
-     * @param int $companyId
-     * @return Collection
+     * @param  int  $companyId
      */
-    public function getTodayAppointments(int $companyId): Collection
+    public function getTodayAppointments(string $companyId): Collection
     {
-        return Appointment::where('company_id', $companyId)
+        return Appointment::query()
             ->today()
-            ->with(['user', 'barber', 'service'])
-            ->orderBy('time')
+            ->with(['client', 'barber', 'service'])
+            ->orderBy('start_time')
             ->get();
     }
 
     /**
      * Get appointments by date range
-     *
-     * @param int $companyId
-     * @param Carbon $startDate
-     * @param Carbon $endDate
-     * @return Collection
      */
     public function getAppointmentsByDateRange(int $companyId, Carbon $startDate, Carbon $endDate): Collection
     {
         return Appointment::where('company_id', $companyId)
             ->whereBetween('date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
-            ->with(['user', 'barber', 'service'])
+            ->with(['client', 'barber', 'service'])
             ->orderBy('date')
-            ->orderBy('time')
+            ->orderBy('start_time')
             ->get();
     }
 
     /**
      * Get total revenue for a date range
-     *
-     * @param int $companyId
-     * @param Carbon $startDate
-     * @param Carbon $endDate
-     * @return float
      */
     public function getRevenueByDateRange(int $companyId, Carbon $startDate, Carbon $endDate): float
     {
@@ -152,10 +163,6 @@ class AppointmentService
 
     /**
      * Get most used services
-     *
-     * @param int $companyId
-     * @param int $limit
-     * @return array
      */
     public function getMostUsedServices(int $companyId, int $limit = 5): array
     {
