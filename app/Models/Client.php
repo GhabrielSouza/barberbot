@@ -2,13 +2,18 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 
 class Client extends Model
 {
+    use HasUuids;
+
     protected $connection = 'tenant';
 
-    public $incrementing = false;
+    const UPDATED_AT = null;
 
-    protected $keyType = 'string';
+    protected $fillable = ['name', 'phone', 'tag', 'notes', 'rating', 'color'];
+
+    protected $casts = ['rating' => 'decimal:1'];
 }

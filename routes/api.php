@@ -4,6 +4,7 @@ use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\BarberController;
+use App\Http\Controllers\ClientController;
 use App\Http\Controllers\CommissionMethodController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PlanController;
@@ -101,6 +102,8 @@ Route::middleware(['api'])->prefix('tenants/{tenant}')->group(function () {
 Route::middleware(['web', 'auth', 'resolve.tenant.user'])->group(function () {
     // Dashboard Routes
     Route::prefix('companies/{company}')->group(function () {
+        Route::apiResource('clients', ClientController::class);
+
         Route::prefix('dashboard')->group(function () {
             Route::get('metrics', [DashboardController::class, 'metrics']);
             Route::get('appointments', [DashboardController::class, 'appointmentsByDateRange']);
