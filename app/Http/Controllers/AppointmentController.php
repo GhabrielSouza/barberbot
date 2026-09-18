@@ -25,8 +25,8 @@ class AppointmentController extends Controller
      */
     public function index(Tenant $company): AnonymousResourceCollection
     {
-        $appointments = Appointment::where('company_id', $company->id)
-            ->with(['user', 'barber', 'service'])
+        $appointments = Appointment::query()
+            ->with(['client', 'barber', 'service'])
             ->orderBy('date', 'desc')
             ->paginate(15);
 
@@ -50,25 +50,11 @@ class AppointmentController extends Controller
      */
     public function store(CreateAppointmentRequest $request, Tenant $company)
     {
-        try {
-            $appointment = $this->appointmentService->createAppointment(
-                $request->user,
-                $request->barber,
-                $request->service,
-                $request->date,
-                $request->time
-            );
+        $appointment = $this->appointmentService->createForTenant($request->validated());
 
-            $this->appointmentService->confirmAppointment($appointment);
-            $appointment->load(['user', 'barber', 'service']);
+        $appointment->load(['client', 'barber', 'service']);
 
-            return new AppointmentResource($appointment);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage(),
-            ], 422);
-        }
+        return new AppointmentResource($appointment);
     }
 
     /**
@@ -76,11 +62,7 @@ class AppointmentController extends Controller
      */
     public function show(Tenant $company, Appointment $appointment): AppointmentResource
     {
-        if ($appointment->company_id !== $company->id) {
-            abort(403);
-        }
-
-        $appointment->load(['user', 'barber', 'service']);
+        $appointment->load(['client', 'barber', 'service']);
 
         return new AppointmentResource($appointment);
     }
@@ -92,27 +74,16 @@ class AppointmentController extends Controller
      */
     public function update(UpdateAppointmentRequest $request, Tenant $company, Appointment $appointment)
     {
-        if ($appointment->company_id !== $company->id) {
-            abort(403);
-        }
+        match ($request->status) {
+            'confirmed' => $this->appointmentService->confirmAppointment($appointment),
+            'cancelled' => $this->appointmentService->cancelAppointment($appointment),
+            'done' => $this->appointmentService->completeAppointment($appointment),
+            default => $appointment->update(['status' => 'pending']),
+        };
 
-        try {
-            match ($request->status) {
-                'confirmed' => $this->appointmentService->confirmAppointment($appointment),
-                'canceled' => $this->appointmentService->cancelAppointment($appointment),
-                'completed' => $this->appointmentService->completeAppointment($appointment),
-                default => $appointment,
-            };
+        $appointment->load(['client', 'barber', 'service']);
 
-            $appointment->load(['user', 'barber', 'service']);
-
-            return new AppointmentResource($appointment);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage(),
-            ], 422);
-        }
+        return new AppointmentResource($appointment);
     }
 
     /**
@@ -120,10 +91,6 @@ class AppointmentController extends Controller
      */
     public function cancel(Tenant $company, Appointment $appointment): JsonResponse
     {
-        if ($appointment->company_id !== $company->id) {
-            abort(403);
-        }
-
         $this->appointmentService->cancelAppointment($appointment);
 
         return response()->json([
@@ -137,10 +104,6 @@ class AppointmentController extends Controller
      */
     public function destroy(Tenant $company, Appointment $appointment): JsonResponse
     {
-        if ($appointment->company_id !== $company->id) {
-            abort(403);
-        }
-
         $appointment->delete();
 
         return response()->json([

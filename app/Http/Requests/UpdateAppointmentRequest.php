@@ -23,7 +23,7 @@ class UpdateAppointmentRequest extends FormRequest
         return [
             'status' => [
                 'required',
-                Rule::in(['pending', 'confirmed', 'canceled', 'completed']),
+                Rule::in(['pending', 'confirmed', 'cancelled', 'done']),
             ],
         ];
     }
@@ -35,7 +35,7 @@ class UpdateAppointmentRequest extends FormRequest
     {
         return [
             'status.required' => 'O status é obrigatório',
-            'status.in' => 'O status deve ser um dos seguintes: pending, confirmed, canceled, completed',
+            'status.in' => 'O status deve ser um dos seguintes: pending, confirmed, cancelled, done',
         ];
     }
 

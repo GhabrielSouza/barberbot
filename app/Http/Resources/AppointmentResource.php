@@ -17,14 +17,20 @@ class AppointmentResource extends JsonResource
         return [
             'id' => $this->id,
             'date' => $this->date->format('Y-m-d'),
-            'time' => $this->time,
+            'client_id' => $this->client_id,
+            'team_member_id' => $this->team_member_id,
+            'service_id' => $this->service_id,
+            'service_name' => $this->service_name,
+            'price' => $this->price,
+            'start_time' => $this->start_time,
+            'end_time' => $this->end_time,
+            'payment_method' => $this->payment_method,
             'status' => $this->status,
-            'user' => new UserResource($this->whenLoaded('user')),
+            'client' => $this->whenLoaded('client'),
             'barber' => new BarberResource($this->whenLoaded('barber')),
             'service' => new ServiceResource($this->whenLoaded('service')),
-            'total_value' => $this->whenLoaded('service', fn () => $this->service->price),
+            'total_value' => $this->price,
             'created_at' => $this->created_at->toIso8601String(),
-            'updated_at' => $this->updated_at->toIso8601String(),
         ];
     }
 }

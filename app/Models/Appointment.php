@@ -2,44 +2,37 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Appointment extends Model
 {
-    use HasFactory;
+    use HasFactory, HasUuids;
+
+    const UPDATED_AT = null;
 
     protected $connection = 'tenant';
 
     protected $fillable = [
-        'user_id',
-        'barber_id',
-        'service_id',
-        'company_id',
-        'date',
-        'time',
-        'status',
+        'client_id', 'team_member_id', 'service_id', 'service_name', 'price',
+        'date', 'start_time', 'end_time', 'status', 'payment_method',
     ];
 
     protected $casts = [
         'date' => 'date',
+        'price' => 'decimal:2',
     ];
 
-    /**
-     * Get the user (client) for this appointment
-     */
-    public function user(): BelongsTo
+    public function client(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(Client::class);
     }
 
-    /**
-     * Get the barber for this appointment
-     */
     public function barber(): BelongsTo
     {
-        return $this->belongsTo(Barber::class);
+        return $this->belongsTo(Barber::class, 'team_member_id');
     }
 
     /**
@@ -48,14 +41,6 @@ class Appointment extends Model
     public function service(): BelongsTo
     {
         return $this->belongsTo(Service::class);
-    }
-
-    /**
-     * Get the company for this appointment
-     */
-    public function company(): BelongsTo
-    {
-        return $this->belongsTo(Company::class);
     }
 
     /**
@@ -79,7 +64,7 @@ class Appointment extends Model
      */
     public function scopeForBarber($query, $barberId)
     {
-        return $query->where('barber_id', $barberId);
+        return $query->where('team_member_id', $barberId);
     }
 
     /**
