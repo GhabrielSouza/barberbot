@@ -9,6 +9,7 @@ use App\Models\Product;
 use App\Models\Tenant;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
@@ -100,5 +101,19 @@ class ProductController extends Controller
             'success' => true,
             'message' => 'Product deleted successfully',
         ]);
+    }
+
+    /**
+     * Add stock to a product without reading current value (atomic increment).
+     */
+    public function restock(Request $request, Tenant $company, Product $product): ProductResource
+    {
+        $data = $request->validate([
+            'add' => ['required', 'integer', 'min:1'],
+        ]);
+
+        $product->increment('stock', (int) $data['add']);
+
+        return new ProductResource($product->fresh());
     }
 }

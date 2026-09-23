@@ -9,6 +9,9 @@ use App\Http\Controllers\CommissionMethodController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PlanController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\SalesController;
+use App\Http\Controllers\ExpensesController;
+use App\Http\Controllers\PixConfigController;
 use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\TenantController;
@@ -165,7 +168,27 @@ Route::middleware(['web', 'auth', 'resolve.tenant.user'])->group(function () {
             Route::get('{product}', [ProductController::class, 'show']);
             Route::put('{product}', [ProductController::class, 'update']);
             Route::patch('{product}/toggle', [ProductController::class, 'toggleActive']);
+            Route::patch('{product}/restock', [ProductController::class, 'restock']);
             Route::delete('{product}', [ProductController::class, 'destroy']);
         });
+
+        // Finance Routes: sales, expenses, pix config
+        Route::prefix('sales')->group(function () {
+            Route::get('/', [SalesController::class, 'index']);
+            Route::post('/', [SalesController::class, 'store']);
+            Route::get('{sale}', [SalesController::class, 'show']);
+            Route::delete('{sale}', [SalesController::class, 'destroy']);
+        });
+
+        Route::prefix('expenses')->group(function () {
+            Route::get('/', [ExpensesController::class, 'index']);
+            Route::post('/', [ExpensesController::class, 'store']);
+            Route::get('{expense}', [ExpensesController::class, 'show']);
+            Route::delete('{expense}', [ExpensesController::class, 'destroy']);
+        });
+
+        // Pix config (single row per tenant)
+        Route::get('pix-config', [PixConfigController::class, 'show']);
+        Route::post('pix-config', [PixConfigController::class, 'store']);
     });
 });
